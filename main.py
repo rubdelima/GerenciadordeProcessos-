@@ -100,6 +100,12 @@ thr.start()
 
 
 while True:
+    screen.fill(background_color)
+    for box in lista_box:
+        box.atualizar_botao()
+    
+    box_titulo.atualizar_botao()
+    botao_inserir.atualizar_botao()
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -111,7 +117,6 @@ while True:
             print(mouse_pos)
             for i in lista_global:
                 lista_aux = []
-                print('sdfasdf')
                 for j in i:
                     a = j.pos_x < mouse_pos[0] < j.pos_x + j.size_x
                     b = j.pos_y < mouse_pos[1] < j.pos_y + j.size_y

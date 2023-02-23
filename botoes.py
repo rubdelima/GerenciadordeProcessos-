@@ -17,6 +17,7 @@ class Botao():
         self.is_selected = False
         self.atualizar_botao()
         
+        
     def atualizar_botao(self):
         if self.is_selected:
             self.color = (0, 191, 99)
