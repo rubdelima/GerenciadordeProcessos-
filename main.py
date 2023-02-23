@@ -154,6 +154,8 @@ while True:
                     a = j.pos_x < mouse_pos[0] < j.pos_x + j.size_x
                     b = j.pos_y < mouse_pos[1] < j.pos_y + j.size_y
                     if a and b:
+                        for k in i:
+                            k.is_selected = False
                         j.is_selected = not j.is_selected
                         break
             a = botao_inserir.pos_x < mouse_pos[0] < botao_inserir.pos_x + botao_inserir.size_x
