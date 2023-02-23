@@ -1,56 +1,18 @@
 import pygame
-from botoes import Retangulo, Circulo, Processo
+from botoes import Botao, Processo
 import time
 from threading import Thread
 
 tempo_corrido = 0
+
 def update_time():
     global tempo_corrido
     global encerrar
     while not encerrar:
         time.sleep(0.1)
         tempo_corrido = tempo_corrido + 1
-
-def atualizar_lista():
-    global lista_processos
-    global tipo_processo
-    if len(lista_processos) > 0:
-        match(tipo_processo):
-            case 'Round Robin':
-                round_robin()
-            case '  Priority':
-                priority()
-            case '      SJF':
-                sjf()
-            case '     FiFo':
-                fifo()
-            case _:
-                pass
-    
-def round_robin():
-    global lista_processos
-    for i in lista_processos:
-        i.size_x -= 1
-
-
-def fifo():
-    global lista_processos
-    if lista_processos[0].size_x >0:
-        lista_processos[0].size_x -= 1
-    if lista_processos[0].size_x <= 0:
-        del lista_processos[0]
-
-        
-def sjf():
-    global lista_processos
-    lista_processos = sorted(lista_processos, key=lambda x: x.size_x)
-    fifo()
-
-def priority():
-    global lista_processos
-    lista_processos = sorted(lista_processos, key=lambda x: x.prioridade, reverse=True)
-
-
+        if tempo_corrido >1000:
+            tempo_corrido = 1
 
 pygame.init()
 # Defindo as globais da tela
@@ -58,7 +20,7 @@ window_size = (600, 600)
 background_color = (217, 217, 217)
 screen = pygame.display.set_mode(window_size)
 screen.fill(background_color)
-box_titulo = Retangulo(
+box_titulo = Botao(
     janela = screen,
     pos_x=50, pos_y= 20, size_x = 500, size_y = 50,
     color=(166, 166, 166), label='    Escalonador de Processos'
@@ -66,7 +28,7 @@ box_titulo = Retangulo(
 lista_box_aux = ['Tempo de execução:', 'Prioridade:', 'Selecione a Cor:']
 lista_box = []
 for i, box in enumerate(lista_box_aux):
-    lista_box.append(Retangulo(
+    lista_box.append(Botao(
         janela=screen,
         pos_x= 80, pos_y = 100 + i*50, size_x=440, size_y=40,
         color=(111,111,111), label=box, label_size=15, center=False
@@ -74,30 +36,30 @@ for i, box in enumerate(lista_box_aux):
 
 lista_b_tempo = []
 for i in range(10):
-    lista_b_tempo.append(Circulo(
+    lista_b_tempo.append(Botao(
         janela=screen, 
-        pos_x=300+ 22*i,pos_y = 120, size_x=10, size_y=10,
-        label=f'{i+1}', label_size=15, center=False
+        pos_x=300+ 22*i,pos_y = 110, size_x=20, size_y=20,
+        color=(166, 166, 166), label=f'{i+1}', label_size=15, center=True
     ))
 
 lista_b_prioridade = []
 for i in range(10):
-    lista_b_prioridade.append(Circulo(
+    lista_b_prioridade.append(Botao(
         janela=screen, 
-        pos_x=300+ 22*i,pos_y = 170, size_x=10, size_y=10,
-        label=f'{i+1}', label_size=15, center=False
+        pos_x=300+ 22*i,pos_y = 160, size_x=20, size_y=20,
+        color=(166, 166, 166), label=f'{i+1}', label_size=15, center=True
     ))
 
 lista_b_cores_aux = [(255, 49, 49), (255, 222, 89), (193, 255, 114), (92, 225, 230), (203, 108, 190)]
 lista_b_cores = []
 for i , cor in enumerate(lista_b_cores_aux):
-    lista_b_cores.append(Circulo(
+    lista_b_cores.append(Botao(
         janela=screen, 
-        pos_x=300 + 48*i, pos_y = 220, size_x=20, size_y=20,
-       double=True, double_collor=cor  
+        pos_x=300 + 48*i, pos_y = 200, size_x=40, size_y=40, label=None,
+       color=(166, 166, 166), double=True, double_collor=cor  
     ))
 
-botao_inserir = Retangulo(
+botao_inserir = Botao(
     janela= screen, 
     pos_x=200, pos_y= 270, size_x=200, size_y=50,
     color=(111,111,111), label='       Inserir', label_size=15, center=True
@@ -108,7 +70,7 @@ lista_escalonadores_aux = ['     FiFo', '      SJF', '  Priority', 'Round Robin'
 lista_escalonadores =[]
 
 for i, escalonador in enumerate(lista_escalonadores_aux):
-    lista_escalonadores.append(Retangulo(
+    lista_escalonadores.append(Botao(
         janela= screen, 
         pos_x=50+i*125, pos_y= 330, size_x=100, size_y=50,
         color=(111,111,111), label=escalonador, label_size=15, center=True
@@ -116,7 +78,7 @@ for i, escalonador in enumerate(lista_escalonadores_aux):
 
 lista_escalonadores[0].is_selected = True
 
-barra_processos = Retangulo(
+barra_processos = Botao(
         janela= screen, 
         pos_x=50, pos_y= 450, size_x=500, size_y=100,color=(111,111,111), label=None)
 
@@ -166,7 +128,7 @@ while True:
                 new_tempo = None
                 for i in lista_b_cores:
                     if i.is_selected:
-                        new_cor = i.color
+                        new_cor = i.double_collor
                         #i.is_selected = False
                         #break
                 for i in range(10):
@@ -188,7 +150,6 @@ while True:
                                     janela=screen,pos_x=new_position, pos_y= 450, size_x=new_tempo, size_y=100,
                                     color=new_cor, label=None,prioridade=new_prioridade))
             
-
                         
             
         #print(event)
@@ -203,7 +164,10 @@ while True:
             match(tipo_processo):
                 case 'Round Robin':
                     for i in lista_processos:
-                        i.size_x -= 1
+                        i.size_x -= 1/(len(lista_processos))
+                        if i.size_x <= 0:
+                            del i
+                    
                 case '  Priority':
                     lista_processos = sorted(lista_processos, key=lambda x: x.prioridade, reverse=True)
                 case '      SJF':
@@ -212,6 +176,8 @@ while True:
                     pass
                 
             if tipo_processo != "Round Robin":
+                if len(lista_processos) >0:
+                    lista_processos[0].pos_x = 50
                 if lista_processos[0].size_x >0:
                     lista_processos[0].size_x -= 1
                 if lista_processos[0].size_x <= 0:
